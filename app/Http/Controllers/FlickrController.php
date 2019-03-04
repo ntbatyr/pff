@@ -26,15 +26,14 @@ class FlickrController extends Controller
         $client = new Client(['verify' => false]);
         $response = $client->request('POST', $endpiont, ['query' => $params]);
 
-
         $resp = $response->getBody()->getContents();        // Get response json string
-        $resp = str_replace('jsonFlickrFeed(', '', $resp);  // Fixing json string
-        $resp = str_replace(')', '', $resp);                // Fixing json string
 
-        $object = json_decode($resp);                       //JSON to object
+        $json = $this->StringToJson($resp);                 // Fix response string
+
+        $object = json_decode($json);                       //JSON to object
         $items = $object->items;                            //Getting response items
 
-        return view('flickr.index', compact('object', 'resp', 'items'));
+        return view('flickr.index', compact('items'));
     }
 
     public function photosByTag($tags){
@@ -52,12 +51,20 @@ class FlickrController extends Controller
         $response = $client->request('POST', $endpiont, ['query' => $params]);
 
         $resp = $response->getBody()->getContents();        // Get response json string
-        $resp = str_replace('jsonFlickrFeed(', '', $resp);  // Fixing json string
-        $resp = str_replace(')', '', $resp);                // Fixing json string
 
-        $object = json_decode($resp);                       //JSON to object
+        $json = $this->StringToJson($resp);                 // Fix response string
+
+        $object = json_decode($json);                       //JSON to object
         $items = $object->items;                            //Getting response items
 
         return view('flickr.by-tag-photos', compact('items'));
+    }
+
+    private function StringToJson($string){
+
+        $string = str_replace('jsonFlickrFeed(', '', $string);  // Fixing json string
+        $string = str_replace(')', '', $string);                // Fixing json string
+
+        return $string;
     }
 }
